@@ -30,12 +30,12 @@ def combineKeyCountLists (l1: List[(String, Int)], l2: List[(String, Int)]): Lis
     var ner = MutableList[EntityCounts]()
   }
 
-val rdd = RecordLoader.loadArchives("/mnt/olympics/ARCHIVEIT-7227-CRAWL_SELECTED_SEEDS-JOB237586-20160924051457128-00076.warc.gz", sc).
+val rdd = RecordLoader.loadArchives("/mnt/olympics/*.warc.gz", sc).
     keepValidPages().
-    map(r => (r.getCrawlDate, r.getUrl, RemoveHTML(r.getContentString)))
+    map(r => (r.getCrawlDate, ExtractDomain(r.getUrl), RemoveHTML(r.getContentString)))
 
 val iNerClassifierFile = "/home/ubuntu/warcbase-resources/NER/english.all.3class.distsim.crf.ser.gz"
-val outputFile = "ner3"
+val outputFile = "ner-all-by-day"
 
       rdd.mapPartitions(iter => {
         NER3Classifier.apply(iNerClassifierFile)
