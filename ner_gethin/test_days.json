@@ -1,0 +1,125 @@
+[{
+  "date": "20081104",
+  "domain": "greenparty.ca",
+  "ner": [{
+    "nerType": "PERSON",
+    "entities": [{
+      "entity": "Elizabeth May",
+      "freq": 4
+    }, {
+      "entity": "Stephen Harper",
+      "freq": 2
+    }]
+  }, {
+    "nerType": "ORGANIZATION",
+    "entities": [{
+      "entity": "ABC",
+      "freq": 5
+    }, {
+      "entity": "XYZ",
+      "freq": 6
+    }]
+  }, {
+    "nerType": "LOCATION",
+    "entities": [{
+      "entity": "Winnipeg",
+      "freq": 7
+    }, {
+      "entity": "Toronto",
+      "freq": 2
+    }]
+  }]
+}, {
+  "date": "20091106",
+  "domain": "greenparty.ca",
+  "ner": [{
+    "nerType": "PERSON",
+    "entities": [{
+      "entity": "Geroge May",
+      "freq": 4
+    }, {
+      "entity": "Laureen Harper",
+      "freq": 2
+    }]
+  }, {
+    "nerType": "ORGANIZATION",
+    "entities": [{
+      "entity": "Green Party",
+      "freq": 5
+    }, {
+      "entity": "Red Party",
+      "freq": 6
+    }]
+  }, {
+    "nerType": "LOCATION",
+    "entities": [{
+      "entity": "Ajax",
+      "freq": 7
+    }, {
+      "entity": "Yellowknife",
+      "freq": 2
+    }]
+  }]
+}, {
+  "date": "20090603",
+  "domain": "extra.ca",
+  "ner": [{
+    "nerType": "PERSON",
+    "entities": [{
+      "entity": "Ge May",
+      "freq": 4
+    }, {
+      "entity": "La Harper",
+      "freq": 2
+    }]
+  }, {
+    "nerType": "ORGANIZATION",
+    "entities": [{
+      "entity": "Green Party",
+      "freq": 5
+    }, {
+      "entity": "Red Party",
+      "freq": 6
+    }]
+  }, {
+    "nerType": "LOCATION",
+    "entities": [{
+      "entity": "Ajax",
+      "freq": 7
+    }, {
+      "entity": "Yellowknife",
+      "freq": 2
+    }]
+  }]
+}, {
+  "date": "20090111",
+  "domain": "extra1.ca",
+  "ner": [{
+    "nerType": "PERSON",
+    "entities": [{
+      "entity": "Ge May",
+      "freq": 4
+    }, {
+      "entity": "La Harper",
+      "freq": 2
+    }]
+  }, {
+    "nerType": "ORGANIZATION",
+    "entities": [{
+      "entity": "Green Party",
+      "freq": 5
+    }, {
+      "entity": "Red Party",
+      "freq": 6
+    }]
+  }, {
+    "nerType": "LOCATION",
+    "entities": [{
+      "entity": "Ajax",
+      "freq": 7
+    }, {
+      "entity": "Yellowknife",
+      "freq": 2
+    }]
+  }]
+}]
