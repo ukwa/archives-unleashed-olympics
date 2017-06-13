@@ -1,0 +1,64 @@
+import org.warcbase.spark.matchbox._ 
+import org.warcbase.spark.rdd.RecordRDD._ 
+import org.warcbase.spark.matchbox.ExtractEntities
+import org.warcbase.spark.utils.JsonUtil
+import scala.collection.mutable.MutableList
+
+sc.addFile("/home/ubuntu/warcbase-resources/NER/english.all.3class.distsim.crf.ser.gz")
+
+def combineKeyCountLists (l1: List[(String, Int)], l2: List[(String, Int)]): List[(String, Int)] = {
+    (l1 ++ l2).groupBy(_._1 ).map {
+      case (key, tuples) => (key, tuples.map( _._2).sum) 
+    }.toList
+  }
+
+
+  class Entity(iEntity: String, iFreq: Int) {
+    var entity: String = iEntity
+    var freq: Int = iFreq
+  }
+
+  class EntityCounts(iNerType: String) { 
+    var nerType: String = iNerType
+    var entities = MutableList[Entity]()
+  }
+
+  class NerRecord(recDate: String, recDomain: String) {
+    var date = recDate
+    var domain = recDomain
+
+    var ner = MutableList[EntityCounts]()
+  }
+
+val rdd = RecordLoader.loadArchives("/mnt/olympics/*.warc.gz", sc).
+    keepValidPages().
+    keepUrls(Set("http://antiguaolympiccommittee.com/?page_id=28", "http://corporate.olympics.com.au/the-aoc/inside-the-aoc", "http://www.bahamasolympiccommittee.org/_m1764/Executives", "http://www.olympic.org.bb/?page_id=458", "http://www.olympics.bm/about/our-committees", "http://www.botswananoc.org/about-bnoc?q=node/7", "http://olympic.ca/canadian-olympic-committee/governance/board-of-directors/", "http://doc.dm/about-doc/executive/", "https://www.teamgb.com/boa-board", "http://www.olympic.ind.in/organisation.html", "http://www.jamaicaolympicassociation.com", "http://www.moc.org.mw/index.php?page=19", "http://nocmalta.org/about-us/moc-executive-committee/", "http://www.olympic.org.nz/about-the-nzoc/nzoc-board/", "http://www.nigerianoc.org/about/inside-the-noc/leadership/", "http://nocpakistan.org/aboutus_cac.php?gid=9", "http://www.ttoc.org/index.php/ttoc/executive-committee", "http://www.nocuganda.org", "http://www.virginislandsolympics.org/vioc/executive-body/", "http://www.nocz.co.zm/about-us/", "http://zoc.co.zw/zoc-organs/")).
+    map(r => (r.getCrawlDate, ExtractDomain(r.getUrl), RemoveHTML(r.getContentString)))
+
+val iNerClassifierFile = "/home/ubuntu/warcbase-resources/NER/english.all.3class.distsim.crf.ser.gz"
+val outputFile = "ner-filtered"
+
+      rdd.mapPartitions(iter => {
+        NER3Classifier.apply(iNerClassifierFile)
+          iter.map(r => {
+            val classifiedJson = NER3Classifier.classify(r._3)
+            val classifiedMap = JsonUtil.fromJson(classifiedJson)
+            val classifiedMapCountTuples: Map[String, List[(String, Int)]] = classifiedMap.map {
+              case (nerType, entities: List[String @unchecked]) => (nerType, entities.groupBy(identity).mapValues(_.size).toList)
+            }
+            ((r._1, r._2), classifiedMapCountTuples)
+          })
+      }).reduceByKey( (a, b) => (a ++ b).keySet.map(r => (r, combineKeyCountLists(a(r), b(r)))).toMap).mapPartitions(iter => {
+        iter.map(r => {
+          val nerRec = new NerRecord(r._1._1, r._1._2)
+          r._2.foreach(entityMap => {  
+            // e.g., entityMap = "PERSON" -> List(("Jack", 1), ("Diane", 3))
+            val ec = new EntityCounts(entityMap._1)    
+            entityMap._2.foreach(e => {
+              ec.entities += new Entity(e._1, e._2)
+            })
+            nerRec.ner += ec
+          })
+          JsonUtil.toJson(nerRec)
+        })
+      }).saveAsTextFile(outputFile)
