@@ -334,7 +334,6 @@ function init() {
             sliderRange[pct+'%'] = date;
           }
         })
-        debugger;
 				// Create slider
 				var slider = d3.select("#date-range-slider").node();
 				noUiSlider.create(slider, {
@@ -430,7 +429,6 @@ function nestData(data, view) {
   } else if (view === "3") { // Day view
     nestedView = nestedView.key(function(d) { return d.date })
       .map(filtered);
-    debugger;
     eTypes.forEach(function(eType, eIndex) {
       nd[eType] = {};
       Object.keys(nestedView[eType]).forEach(function(yearMonth, yIndex) {
